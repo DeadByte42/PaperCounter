@@ -1,0 +1,157 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <Authors>DeadByte42</Authors>
+    <Version>1.5.3</Version>
+    <ApplicationIcon>Resources\appicon.ico</ApplicationIcon>
+    <Title>Paper Counter</Title>
+    <Copyright></Copyright>
+    <AssemblyTitle>PaperCounter</AssemblyTitle>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Help\FormatsEML.png" />
+    <None Remove="Resources\Help\FormatsFolder.png" />
+    <None Remove="Resources\Help\FormatsMSG.png" />
+    <None Remove="Resources\Help\FormatsNested.png" />
+    <None Remove="Resources\Help\FormatsPDF.png" />
+    <None Remove="Resources\Help\FormatsZIP.png" />
+    <None Remove="Resources\Help\IconFormats.ico" />
+    <None Remove="Resources\Help\IconInteraction.ico" />
+    <None Remove="Resources\Help\IconTools.ico" />
+    <None Remove="Resources\Help\Interaction1_Drop.png" />
+    <None Remove="Resources\Help\Interaction2_Path.png" />
+    <None Remove="Resources\Help\Tools.png" />
+    <None Remove="Resources\Icons\ConfigMenuArchive.ico" />
+    <None Remove="Resources\Icons\ConfigMenuMail.ico" />
+    <None Remove="Resources\Icons\InfoAbout.ico" />
+    <None Remove="Resources\Icons\InfoHelp.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\appicon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="gong-wpf-dragdrop" Version="4.0.0" />
+    <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="PDFium.WindowsV2" Version="1.1.4" />
+    <PackageReference Include="PDFiumSharpV2" Version="1.1.4" />
+    <PackageReference Include="SharpCompress" Version="0.50.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Include="App.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Aspose.Email.Foss">
+      <HintPath>..\..\! Libs\Aspose.Email-FOSS-for-.Net-main\src\Aspose.Email.Foss\bin\Release\net6.0\Aspose.Email.Foss.dll</HintPath>
+    </Reference>
+    <Reference Include="DB42.Lib.WPF">
+      <HintPath>..\..\DB42.Libs\DB42.Lib.WPF\bin\Release\net6.0-windows\DB42.Lib.WPF.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+	<Resource Include="Resources\appicon.ico" />
+	<Resource Include="Resources\Help\FormatsEML.png" />
+	<Resource Include="Resources\Help\FormatsFolder.png" />
+	<Resource Include="Resources\Help\FormatsMSG.png" />
+	<Resource Include="Resources\Help\FormatsNested.png" />
+	<Resource Include="Resources\Help\FormatsPDF.png" />
+	<Resource Include="Resources\Help\FormatsZIP.png" />
+	<Resource Include="Resources\Help\IconFormats.ico" />
+	<Resource Include="Resources\Help\IconInteraction.ico" />
+	<Resource Include="Resources\Help\IconTools.ico" />
+	<Resource Include="Resources\Help\Interaction1_Drop.png" />
+	<Resource Include="Resources\Help\Interaction2_Path.png" />
+	<Resource Include="Resources\Help\Interaction3_Select.png" />
+	<Resource Include="Resources\Help\Interaction5_Arrange.png" />
+	<Resource Include="Resources\Help\Interaction4_Copy.png" />
+	<Resource Include="Resources\Help\Interaction6_Combine.png" />
+	<Resource Include="Resources\Help\Interaction7_Delete.png" />
+	<Resource Include="Resources\Help\Interaction9_ContextMenu.png" />
+	<Resource Include="Resources\Help\Interaction8_Rename.png" />
+	<Resource Include="Resources\Help\Tools.png" />
+	<Resource Include="Resources\Icons\ConfigMenuArchive.ico" />
+	<Resource Include="Resources\Icons\ConfigMenuMail.ico" />
+	<Resource Include="Resources\Icons\CountOrientation.ico" />
+	<Resource Include="Resources\Icons\InfoAbout.ico" />
+	<Resource Include="Resources\Icons\InfoHelp.ico" />
+    <Resource Include="Resources\Icons\LoadArchive.ico" />
+    <Resource Include="Resources\Icons\CountUnknown.ico" />
+    <Resource Include="Resources\Icons\CountUnknownSize.ico" />
+    <Resource Include="Resources\Icons\CountUnknownToA4.ico" />
+    <Resource Include="Resources\Icons\ListAddFile.ico" />
+    <Resource Include="Resources\Icons\ListCombine.ico" />
+    <Resource Include="Resources\Icons\ListDelete.ico" />
+    <Resource Include="Resources\Icons\ConfigMenuFile.ico" />
+    <Resource Include="Resources\Icons\ListAddFolder.ico" />
+    <Resource Include="Resources\Icons\ConfigMenuFolder.ico" />
+    <Resource Include="Resources\Icons\LoadMail.ico" />
+    <Resource Include="Resources\Icons\ConfigTopmost.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="MainWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="CHANGELOG.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="COM.Server.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="LICENSES\Aspose.Email.Foss">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="LICENSES\ExecuteCommand-Pipe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="LICENSES\gong-wpf-dragdrop">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="LICENSES\Microsoft-WindowsAPICodePack">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="LICENSES\Newtonsoft.Json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="LICENSE">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="LICENSES\pdfium">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="LICENSES\PDFiumSharpV2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="LICENSES\SharpCompress">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="README.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

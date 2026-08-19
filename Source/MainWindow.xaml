@@ -1,0 +1,437 @@
+﻿<Window x:Class="PaperCounter.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PaperCounter"
+        xmlns:utility="clr-namespace:PaperCounter.Utility"
+        xmlns:gong="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.WPF.DragDrop"
+        xmlns:dbext="clr-namespace:DB42.Lib.WPF.Extensions;assembly=DB42.Lib.WPF"
+        mc:Ignorable="d"
+        Title="Paper Counter" Height="585" Width="636" x:Name="wnd">
+
+    <Window.Resources>
+
+
+        <VisualBrush x:Key="vbrush" TileMode="Tile" Viewport="0,0,2,3" ViewportUnits="Absolute" Viewbox="0,0,2,3" ViewboxUnits="Absolute">
+            <VisualBrush.Visual>
+                <Canvas Background="Transparent">
+                    <Rectangle Fill="Gray" Width="1" Height="1"/>
+                    <Rectangle Fill="Gray" Width="1" Height="1" Canvas.Left="1" Canvas.Top="1"/>
+                </Canvas>
+            </VisualBrush.Visual>
+        </VisualBrush>
+
+        <Grid x:Key="tooltip">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Ширина:  " Grid.Row="0" Grid.Column="0"/>
+            <TextBlock Text="{Binding Format.Width}" FontWeight="Bold" Grid.Row="0" Grid.Column="1"/>
+            <TextBlock Text="Высота:  " Grid.Row="1" Grid.Column="0"/>
+            <TextBlock Text="{Binding Format.Height}" FontWeight="Bold" Grid.Row="1" Grid.Column="1"/>
+            <TextBlock Text="Экв. А4:  " Grid.Row="2" Grid.Column="0"/>
+            <TextBlock Text="{Binding Format.A4Count}" FontWeight="Bold" Grid.Row="2" Grid.Column="1"/>
+        </Grid>
+
+        <ControlTemplate x:Key="RoundedProgressBar" TargetType="{x:Type ProgressBar}">
+            <Grid x:Name="TemplateRoot">
+                <VisualStateManager.VisualStateGroups>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Determinate"/>
+                        <VisualState x:Name="Indeterminate">
+                            <Storyboard RepeatBehavior="Forever">
+                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Animation" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleX)">
+                                    <EasingDoubleKeyFrame KeyTime="0" Value="0.25"/>
+                                    <EasingDoubleKeyFrame KeyTime="0:0:1" Value="0.25"/>
+                                    <EasingDoubleKeyFrame KeyTime="0:0:2" Value="0.25"/>
+                                </DoubleAnimationUsingKeyFrames>
+                                <PointAnimationUsingKeyFrames Storyboard.TargetName="Animation" Storyboard.TargetProperty="(UIElement.RenderTransformOrigin)">
+                                    <EasingPointKeyFrame KeyTime="0" Value="-0.5,0.5"/>
+                                    <EasingPointKeyFrame KeyTime="0:0:1" Value="0.5,0.5"/>
+                                    <EasingPointKeyFrame KeyTime="0:0:2" Value="1.5,0.5"/>
+                                </PointAnimationUsingKeyFrames>
+                            </Storyboard>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateManager.VisualStateGroups>
+                <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5"/>
+                <Rectangle x:Name="PART_Track"/>
+                <Grid x:Name="PART_Indicator" ClipToBounds="true" HorizontalAlignment="Left">
+                    <Rectangle x:Name="Indicator" Fill="{TemplateBinding Foreground}"/>
+                    <Rectangle x:Name="Animation" Fill="{TemplateBinding Foreground}" RenderTransformOrigin="0.5,0.5">
+                        <Rectangle.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform/>
+                                <RotateTransform/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Rectangle.RenderTransform>
+                    </Rectangle>
+                </Grid>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="Orientation" Value="Vertical">
+                    <Setter Property="LayoutTransform" TargetName="TemplateRoot">
+                        <Setter.Value>
+                            <RotateTransform Angle="-90"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="IsIndeterminate" Value="true">
+                    <Setter Property="Visibility" TargetName="Indicator" Value="Collapsed"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        <Style TargetType="DataGridColumnHeader" x:Key="PageSetHeader">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="ToolTip" Value="{Binding Description}"/>
+        </Style>
+        <BooleanToVisibilityConverter x:Key="booltovis"/>
+        <utility:DoubleComparerVisibilityConverter x:Key="DoubleLT1toVisibilityConverter" Operator="LessThan" Reference="1" False="Hidden"/>
+    </Window.Resources>
+
+    <Window.DataContext>
+        <local:VM/>
+    </Window.DataContext>
+
+    <Grid dbext:GridExt.Rows="a,a,*"
+        AllowDrop="True" DragEnter="Border_DragEnter" DragOver="Border_DragEnter" Drop="Border_Drop" Background="White">
+
+        <!--  Drop banner  -->
+        <!--<Grid Margin="5">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="80"/>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="100"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<Rectangle RadiusX="10" RadiusY="10" Stroke="LightGray" StrokeDashArray="5,2" StrokeThickness="5" Grid.ColumnSpan="6"/>
+			<Viewbox Margin="5" Grid.Column="1">
+				<Grid Height="150" Width="120">
+					<Rectangle>
+						<Rectangle.Fill>
+							<RadialGradientBrush Center="0.5,0.75" GradientOrigin="0.5,0.85" RadiusX="1" RadiusY="0.4">
+								<GradientStop Color="LightGray" Offset=".2"/>
+								<GradientStop Color="White" Offset=".5"/>
+							</RadialGradientBrush>
+						</Rectangle.Fill>
+					</Rectangle>
+					<Path Width="120" Height="120" Data="M 25 110 V 35 L 50 10 H 95 V 110 Z M 25 35 H 50 V 10" Stroke="#aaa" Fill="White" StrokeThickness="3"/>
+					<Path Width="120" Height="120" Data="M 60 45 V 15 H 90 V 45 Z" Stroke="LightGray" Fill="White" StrokeThickness="2"/>
+					<Path Width="120" Height="120" Data="M 62 50 H 88 M 30 60 H 90 M 30 66 H 90 M 30 72 H 90 M 30 78 H 54 M 30 89 H 90 M 30 95 H 90 M 30 101 H 78" Stroke="LightGray" Fill="White" StrokeThickness="3"/>
+				</Grid>
+			</Viewbox>
+			<Viewbox Margin="5" Grid.Column="3">
+				<Grid Height="150" Width="150">
+					<Rectangle>
+						<Rectangle.Fill>
+							<RadialGradientBrush Center="0.5,0.75" GradientOrigin="0.5,0.85" RadiusX="1" RadiusY="0.4">
+								<GradientStop Color="LightGray" Offset=".2"/>
+								<GradientStop Color="White" Offset=".5"/>
+							</RadialGradientBrush>
+						</Rectangle.Fill>
+					</Rectangle>
+					<Path Width="120" Height="120" Data="M 24 50 v -14 l 16 -16 h 30 v 24 M 24 36 h 16 v -16 M 45 20 l 5 -5 h 30 v 29 m -30 -24 v -5 M 55 15 l 5 -5 h 30 v 34 m -30 -29 v -5" Stroke="#bbb" StrokeThickness="2"/>
+					<Path Width="120" Height="120" Data="M 52 37 v -13 h 14 v 13 Z M 62 20 v -1 h 14 v 13 h -6 M 72 15 v -1 h 14 v 13 h -6 M 28 41 H 66 M 70 36 H 76 M 80 31 H 86" Stroke="#bbb" StrokeThickness="2"/>
+					<Path Width="120" Height="120" Data="M 20 110 q -5 0 -5 -5 v -50 q 0 -5 5 -5 h 42 q 3 0 3 -3 q 0 -3 3 -3 h 26 q 3 0 3 3 q 0 3 3 3 q 5 0 5 5 v 50 q 0 5 -5 5 Z" Stroke="#aaa" Fill="White" StrokeThickness="3"/>
+				</Grid>
+			</Viewbox>
+			<Button Content="Перетащите .pdf файлы или папки" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" Foreground="LightGray" Background="White" FontWeight="Bold" FontStyle="Italic" Click="Button_Click"/>
+		</Grid>-->
+
+        <TabControl Grid.Row="2" x:Name="tabs">
+            <TabItem Header="Сводная таблица">
+                <Grid dbext:GridExt.Columns="2*,a,*" dbext:GridExt.Rows="*,a">
+
+                    <DataGrid Grid.Column="0" x:Name="SummaryGrid"
+                              BorderThickness="0"  Background="White" AlternationCount="2" HeadersVisibility="Column" GridLinesVisibility="Vertical" VerticalGridLinesBrush="#bbb"
+                              ItemsSource="{Binding Documents}"  AutoGenerateColumns="False"  ClipboardCopyMode="IncludeHeader" gong:DragDrop.IsDragSource="True" gong:DragDrop.IsDropTarget="True" gong:DragDrop.DropHandler="{Binding ElementName=wnd}"
+                              CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"  CanUserReorderColumns="False" CanUserSortColumns="False"
+                              SelectionChanged="DataGrid_SelectionChanged" PreviewKeyDown="DataGrid_PreviewKeyDown">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Документ" Binding="{Binding Name}" Width="200" MinWidth="200">
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType="DataGridCell">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsTotal}" Value="False">
+                                                <Setter Property="ToolTip" Value="{Binding Path}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Листов" IsReadOnly="True" Binding="{Binding Count}"/>
+                            <DataGridTextColumn Header="Экв. А4" IsReadOnly="True" Binding="{Binding CountA4, StringFormat=0.##}"/>
+                        </DataGrid.Columns>
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Style.Triggers>
+                                    <Trigger Property="AlternationIndex" Value="1">
+                                        <Setter Property="Background" Value="#ebebf0"/>
+                                    </Trigger>
+                                    <DataTrigger Binding="{Binding IsError}" Value="True">
+                                        <Setter Property="Background" Value="#fba"/>
+                                        <Setter Property="Foreground" Value="#610"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsTotal}" Value="True">
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+                    </DataGrid>
+
+                    <GridSplitter ResizeBehavior="PreviousAndNext" Grid.Column="1" Grid.RowSpan="2">
+                        <GridSplitter.Template>
+                            <ControlTemplate>
+                                <Rectangle Width="4" Fill="{StaticResource vbrush}" Margin="1"/>
+                            </ControlTemplate>
+                        </GridSplitter.Template>
+                    </GridSplitter>
+
+                    <DataGrid Grid.Column="2"
+                              BorderThickness="0"  Background="White" AlternatingRowBackground="#ebebf0" HeadersVisibility="Column" GridLinesVisibility="Vertical" VerticalGridLinesBrush="#bbb"
+                              ItemsSource="{Binding SelectedDoc.Pages}" AutoGenerateColumns="False"  ClipboardCopyMode="IncludeHeader"
+                              CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"  CanUserReorderColumns="False" CanUserSortColumns="False">
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Формат" IsReadOnly="True" Binding="{Binding Info.Name}">
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType="DataGridCell">
+                                        <Setter Property="ToolTip" Value="{Binding Info.Description}" />
+                                    </Style>
+                                </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Листов" IsReadOnly="True" Binding="{Binding Count}"/>
+                            <DataGridTextColumn Header="Экв. А4" IsReadOnly="True" Binding="{Binding CountA4, StringFormat=0.##}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Подробности">
+                <DataGrid x:Name="DetailGrid"
+                          BorderThickness="0"  Background="White" AlternationCount="2" HeadersVisibility="Column" GridLinesVisibility="Vertical" VerticalGridLinesBrush="#bbb"
+                          ItemsSource="{Binding Documents}"  AutoGenerateColumns="False"  ClipboardCopyMode="IncludeHeader" gong:DragDrop.IsDragSource="True" gong:DragDrop.IsDropTarget="True" gong:DragDrop.DropHandler="{Binding ElementName=wnd}"
+                          CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"  CanUserReorderColumns="False" CanUserSortColumns="False"
+                          PreviewKeyDown="DataGrid_PreviewKeyDown">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Документ" Binding="{Binding Name}" Width="200" MinWidth="200">
+                            <DataGridTextColumn.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsTotal}" Value="False">
+                                            <Setter Property="ToolTip" Value="{Binding Path}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Листов" IsReadOnly="True" Binding="{Binding Count}"  FontWeight="Bold"/>
+                        <DataGridTextColumn Header="Экв. А4"  IsReadOnly="True" Binding="{Binding CountA4, StringFormat=0.##}"  FontWeight="Bold"/>
+                    </DataGrid.Columns>
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Style.Triggers>
+                                <Trigger Property="AlternationIndex" Value="1">
+                                    <Setter Property="Background" Value="#ebebf0"/>
+                                </Trigger>
+                                <DataTrigger Binding="{Binding IsError}" Value="True">
+                                    <Setter Property="Background" Value="#fba"/>
+                                    <Setter Property="Foreground" Value="#610"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsTotal}" Value="True">
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.RowStyle>
+                </DataGrid>
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="3,0">
+            <StackPanel.Resources>
+                <Style TargetType="ToggleButton">
+                    <Setter Property="Background" Value="#eee"/>
+                    <Style.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                            <Setter Property="Padding" Value="2"/>
+                            <Setter Property="Margin" Value="2,4"/>
+                        </Style>
+                        <Style TargetType="Image">
+                            <Setter Property="Stretch" Value="None"/>
+                        </Style>
+                    </Style.Resources>
+                </Style>
+                <Style TargetType="Button">
+                    <Setter Property="Background" Value="#eee"/>
+                    <Style.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="5"/>
+                            <Setter Property="Padding" Value="2"/>
+                            <Setter Property="Margin" Value="2,4"/>
+                        </Style>
+                        <Style TargetType="Image">
+                            <Setter Property="Stretch" Value="None"/>
+                        </Style>
+                    </Style.Resources>
+                </Style>
+            </StackPanel.Resources>
+            <Button ToolTip="Добавить файлы..." Command="{Binding SelectFilesCommand}">
+                <Image Source="{dbext:Icon /PaperCounter;component/Resources/Icons/ListAddFile.ico, 16}" />
+            </Button>
+            <Button ToolTip="Добавить папки..." Command="{Binding SelectFoldersCommand}">
+                <Image Source="{dbext:Icon /PaperCounter;component/Resources/Icons/ListAddFolder.ico, 16}" />
+            </Button>
+            <Button  ToolTip="Объединить документы" Click="ListCombine_Click">
+                <Image Source="{dbext:Icon /PaperCounter;component/Resources/Icons/ListCombine.ico, 16}" />
+            </Button>
+            <Button ToolTip="Удалить из списка" Click="ListDelete_Click">
+                <Image Source="{dbext:Icon /PaperCounter;component/Resources/Icons/ListDelete.ico, 16}" />
+            </Button>
+            <Rectangle  Width="1" Margin="3,6" Fill="LightGray"/>
+            <ToggleButton ToolTip="Искать документы в архивах" IsChecked="{Binding IsLoadArchives}">
+                <Image Source="{dbext:Icon /PaperCounter;component/Resources/Icons/LoadArchive.ico, 16}" />
+            </ToggleButton>
+            <ToggleButton ToolTip="Искать документы в сохраненных e-mail" IsChecked="{Binding IsLoadMail}">
+                <Image Source="{dbext:Icon /PaperCounter;component/Resources/Icons/LoadMail.ico, 16}" />
+            </ToggleButton>
+            <Rectangle  Width="1" Margin="3,6" Fill="LightGray"/>
+            <ToggleButton ToolTip="Учитывать ориентацию" IsChecked="{Binding IsCountMiscOrientation}">
+                <Image Source="{dbext:Icon /PaperCounter;component/Resources/Icons/CountOrientation.ico, 16}" />
+            </ToggleButton>
+            <ToggleButton ToolTip="Учитывать неформатные листы" IsChecked="{Binding IsCountMisc}">
+                <Image Source="{dbext:Icon /PaperCounter;component/Resources/Icons/CountUnknown.ico, 16}" />
+            </ToggleButton>
+            <ToggleButton ToolTip="Экв.А4 для неформатных листов" IsChecked="{Binding IsCountMiscA4}">
+                <Image Source="{dbext:Icon /PaperCounter;component/Resources/Icons/CountUnknownToA4.ico, 16}" />
+            </ToggleButton>
+            <ToggleButton ToolTip="Точные размеры неформатных листов" IsChecked="{Binding IsCountMiscExact}">
+                <Image Source="{dbext:Icon /PaperCounter;component/Resources/Icons/CountUnknownSize.ico, 16}" />
+            </ToggleButton>
+            <Rectangle  Width="1" Margin="3,6" Fill="LightGray"/>
+            <ToggleButton ToolTip="Добавить в контекстное меню для файлов PDF"  IsChecked="{Binding IsContextMenuPDF}">
+                <Image Source="{dbext:Icon /PaperCounter;component/Resources/Icons/ConfigMenuFile.ico, 16}" />
+            </ToggleButton>
+            <ToggleButton ToolTip="Добавить в контекстное меню для папок" IsChecked="{Binding IsContextMenuFolders}">
+                <Image Source="{dbext:Icon /PaperCounter;component/Resources/Icons/ConfigMenuFolder.ico, 16}" />
+            </ToggleButton>
+            <ToggleButton ToolTip="Добавить в контекстное меню для архивов"  IsChecked="{Binding IsContextMenuArch}">
+                <Image Source="{dbext:Icon /PaperCounter;component/Resources/Icons/ConfigMenuArchive.ico, 16}" />
+            </ToggleButton>
+            <ToggleButton ToolTip="Добавить в контекстное меню для e-mail"  IsChecked="{Binding IsContextMenuMail}">
+                <Image Source="{dbext:Icon /PaperCounter;component/Resources/Icons/ConfigMenuMail.ico, 16}" />
+            </ToggleButton>
+            <ToggleButton ToolTip="Поверх других окон"  IsChecked="{Binding Topmost,ElementName=wnd}">
+                <Image Source="{dbext:Icon /PaperCounter;component/Resources/Icons/ConfigTopmost.ico, 16}" />
+            </ToggleButton>
+            <Rectangle  Width="1" Margin="3,6" Fill="LightGray"/>
+            <Button  ToolTip="Справка..." Click="InfoHelp_Click">
+                <Image Source="{dbext:Icon /PaperCounter;component/Resources/Icons/InfoHelp.ico, 16}" />
+            </Button>
+            <Button ToolTip="О программе..." Click="InfoAbout_Click">
+                <Image Source="{dbext:Icon /PaperCounter;component/Resources/Icons/InfoAbout.ico, 16}" />
+            </Button>
+        </StackPanel>
+
+        <Grid Background="White" Margin="2" Grid.Row="1" dbext:GridExt.Columns="*,a" Visibility="{Binding Queue.IsBusy, Converter={StaticResource booltovis}}">
+            <ProgressBar Value="{Binding Queue.ProcessedFiles, Mode=OneWay}" Maximum="{Binding Queue.TotalFiles, Mode=OneWay}" Margin="3">
+                <ProgressBar.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="4"/>
+                    </Style>
+                    <Style TargetType="Rectangle">
+                        <Setter Property="RadiusX" Value="4"/>
+                        <Setter Property="RadiusY" Value="4"/>
+                    </Style>
+                </ProgressBar.Resources>
+            </ProgressBar>
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
+			<Run Text="Загрузка: "/>
+			<Run Text="{Binding Queue.ProcessedFiles, Mode=OneWay}"/>
+			<Run Text="/"/>
+			<Run Text="{Binding Queue.TotalFiles, Mode=OneWay}"/>
+            </TextBlock>
+            <Button Grid.Column="1" Margin="3" Padding="5,2" Command="{Binding CancelProcessingCommand}">
+                <Button.Content>
+                    <TextBlock VerticalAlignment="Center">
+					<Run Text="❌" Foreground="Red"/>
+					<Run Text="Прервать"/>
+                    </TextBlock>
+                </Button.Content>
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="4"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </Grid>
+
+        <Grid Background="#8888"  Grid.RowSpan="3" Grid.ColumnSpan="3" Visibility="{Binding IsAboutShown, Converter={StaticResource booltovis}}">
+            <Border MaxWidth="400" MaxHeight="400" Margin="20" Background="White" BorderThickness="1" BorderBrush="Gray" CornerRadius="8" UseLayoutRounding="True">
+                <Grid dbext:GridExt.Columns="*,a" dbext:GridExt.Rows="a,a,*">
+                    <Button Grid.Column="1" BorderThickness="0" Background="Transparent" Padding="2" Margin="4" Click="InfoAbout_Click ">
+                        <Path Width="16" Height="16" Data="M2,2 L14,14 M2,14 L14,2" StrokeThickness="1" Stroke="Black"/>
+                    </Button>
+                    <Rectangle Margin="5,0" Grid.Row="1" Grid.ColumnSpan="2" Fill="LightGray" Height="1"/>
+                    <TextBlock Margin="4" FontWeight="Bold" FontSize="15" Text="PaperCounter"/>
+                    <ScrollViewer Grid.Row="2" Grid.ColumnSpan="2" Margin="2"  HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel  MinWidth="380">
+                            <StackPanel.Resources>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextWrapping" Value="Wrap"/>
+                                    <Setter Property="Margin" Value="2"/>
+                                </Style>
+                            </StackPanel.Resources>
+                            <TextBlock Text="Версия: 1.5.3"/>
+                            <TextBlock Text="Разработчик: DeadByte42 (Кокорин Андрей)"/>
+                            <TextBlock>Исходный код:
+                            <Hyperlink NavigateUri="https://github.com/DeadByte42/PaperCounter" RequestNavigate="HyperlinkNavigate">Github</Hyperlink>
+                            </TextBlock>
+                            <TextBlock Margin="2,7,2,2" FontWeight="Bold" Text="Сторонние библиотеки:"/>
+                            <TextBlock >
+                            <Hyperlink NavigateUri="https://pdfium.googlesource.com/pdfium/" RequestNavigate="HyperlinkNavigate">PDFium</Hyperlink>, <Hyperlink NavigateUri="https://github.com/Morcatko/PDFiumSharp-2" RequestNavigate="HyperlinkNavigate">PDFiumSharpV2</Hyperlink> - Открытие .pdf
+                            </TextBlock>
+                            <TextBlock>
+                            <Hyperlink NavigateUri="https://github.com/adamhathcock/sharpcompress" RequestNavigate="HyperlinkNavigate">SharpCompress</Hyperlink> - Поддержка чтения архивов различных форматов
+                            </TextBlock>
+                            <TextBlock >
+                            <Hyperlink NavigateUri="https://github.com/aspose-email-foss/Aspose.Email-FOSS-for-.NET" RequestNavigate="HyperlinkNavigate">Aspose.Email.Foss</Hyperlink> - Поддержка чтения содержимого эл. писем
+                            </TextBlock>
+                            <TextBlock>
+                            <Hyperlink NavigateUri="https://github.com/JamesNK/Newtonsoft.Json" RequestNavigate="HyperlinkNavigate">Newtonsoft.Json</Hyperlink> - Сохранение и считывание настроек
+                            </TextBlock>
+                            <TextBlock>
+                            <Hyperlink NavigateUri="https://github.com/ge9/ExecuteCommand-Pipe" RequestNavigate="HyperlinkNavigate">ExecuteCommand-Pipe</Hyperlink> - Интеграция в контекстное меню Проводника
+                            </TextBlock>
+                            <TextBlock>
+                            <Hyperlink NavigateUri="https://github.com/punker76/gong-wpf-dragdrop" RequestNavigate="HyperlinkNavigate">Gong.WPF.DragDrop</Hyperlink> - Перетаскивание в списках с визуальным откликом
+                            </TextBlock>
+                            <TextBlock>
+                            <Hyperlink NavigateUri="https://github.com/contre/Windows-API-Code-Pack-1.1" RequestNavigate="HyperlinkNavigate">Microsoft.WindowsAPICodePack.Shell</Hyperlink> - Cистемное диалоговое окно выбора папок
+                            </TextBlock>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!--<Border Grid.Row="3" BorderThickness="0,1,0,0" BorderBrush="Gray">
+            <TextBlock Text="Кокорин Андрей, 2025-2026" Foreground="DimGray"  TextAlignment="Right" Margin="2,1"/>
+        </Border>-->
+    </Grid>
+</Window>

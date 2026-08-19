@@ -1,0 +1,275 @@
+﻿<Window x:Class="PaperCounter.HelpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ext="clr-namespace:DB42.Lib.WPF.Extensions;assembly=DB42.Lib.WPF"
+        xmlns:local="clr-namespace:PaperCounter"
+        mc:Ignorable="d"
+        Title="Помощь" Height="800" Width="1000"  UseLayoutRounding="True">
+
+    <Window.Resources>
+
+
+        <VisualBrush x:Key="vbrush" TileMode="Tile" Viewport="0,0,2,3" ViewportUnits="Absolute" Viewbox="0,0,2,3" ViewboxUnits="Absolute">
+            <VisualBrush.Visual>
+                <Canvas Background="Transparent">
+                    <Rectangle Fill="Gray" Width="1" Height="1"/>
+                    <Rectangle Fill="Gray" Width="1" Height="1" Canvas.Left="1" Canvas.Top="1"/>
+                </Canvas>
+            </VisualBrush.Visual>
+        </VisualBrush>
+
+    </Window.Resources>
+
+    <TabControl TabStripPlacement="Left" HorizontalContentAlignment="Left">
+        <TabItem>
+            <TabItem.Header>
+                <DockPanel>
+                    <Image Width="24" Margin="4" Source="{ext:Icon /PaperCounter;component/Resources/Help/IconFormats.ico, 24}"/>
+                    <TextBlock Text="Поддерживаемые форматы" VerticalAlignment="Center"/>
+                </DockPanel>
+            </TabItem.Header>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+                <Grid ext:GridExt.Columns="a,*" ext:GridExt.Rows="a#20">
+                    <Grid.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="Margin" Value="4,4,4,20"/>
+                            <Setter Property="VerticalAlignment" Value="Top"/>
+                            <Setter Property="BorderBrush" Value="LightGray"/>
+                            <Setter Property="BorderThickness" Value="1"/>
+                            <Setter Property="CornerRadius" Value="5"/>
+                        </Style>
+                        <Style TargetType="Image">
+                            <Setter Property="Margin" Value="4"/>
+                            <Setter Property="Height" Value="32"/>
+                            <Setter Property="Width" Value="32"/>
+                            <Setter Property="RenderOptions.EdgeMode" Value="Aliased"/>
+                            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
+                        </Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Grid.Column" Value="1"/>
+                            <Setter Property="TextWrapping" Value="Wrap"/>
+                            <Setter Property="Margin" Value="1"/>
+                        </Style>
+                    </Grid.Resources>
+                    <Border Grid.Row="0">
+                        <Image Source="/Resources/Help/FormatsPDF.png"/>
+                    </Border>
+                    <StackPanel Grid.Row="0" Grid.Column="1">
+                        <TextBlock Text="Документ Adobe PDF (.pdf)" FontWeight="Bold"/>
+                        <TextBlock Text="Основной поддерживаемый формат"/>
+                    </StackPanel>
+                    <Border Grid.Row="1">
+                        <Image Source="/Resources/Help/FormatsEML.png"/>
+                    </Border>
+                    <StackPanel Grid.Row="1" Grid.Column="1">
+                        <TextBlock Text="Сообщения электронной почты (.eml)" FontWeight="Bold"/>
+                        <TextBlock Text="Поиск документов во вложениях сохранённых писем (если включено)"/>
+                    </StackPanel>
+                    <Border Grid.Row="2">
+                        <Image Source="/Resources/Help/FormatsMSG.png"/>
+                    </Border>
+                    <StackPanel Grid.Row="2" Grid.Column="1">
+                        <TextBlock Text="Документ Adobe PDF (.pdf)" FontWeight="Bold"/>
+                        <TextBlock Text="Поиск документов во вложениях сохранённых писем (если включено)"/>
+                    </StackPanel>
+                    <Border Grid.Row="3">
+                        <Image Source="/Resources/Help/FormatsZIP.png"/>
+                    </Border>
+                    <StackPanel Grid.Row="3" Grid.Column="1">
+                        <TextBlock Text="Архивы (.7z, .zip, .rar и другие)" FontWeight="Bold"/>
+                        <TextBlock Text="Поиск документов в распространенных и не очень архивах (если включено)"/>
+                        <TextBlock Text=".rar, .zip, .7z, .tar, .gz, .bz2, .lz, .xz, .tgz, .tbz2, .txz, .zst, .lzw, .ace, .arc, .arj "/>
+                    </StackPanel>
+                    <Border Grid.Row="4">
+                        <Image Source="/Resources/Help/FormatsFolder.png"/>
+                    </Border>
+                    <StackPanel Grid.Row="4" Grid.Column="1">
+                        <TextBlock Text="Папки" FontWeight="Bold"/>
+                        <TextBlock Text="Поиск документов внутри папок"/>
+                    </StackPanel>
+                    <Border Grid.Row="5">
+                        <Image Source="/Resources/Help/FormatsNested.png"/>
+                    </Border>
+                    <StackPanel Grid.Row="5" Grid.Column="1">
+                        <TextBlock Text="Многоуровневый поиск" FontWeight="Bold"/>
+                        <TextBlock Text="Поддерживаемые форматы могут быть многократно вложенными, например, архив с PDF документами приложен к письму"/>
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+        </TabItem>
+        <TabItem>
+            <TabItem.Header>
+                <DockPanel>
+                    <Image Width="24" Margin="4" Source="{ext:Icon /PaperCounter;component/Resources/Help/IconTools.ico, 24}"/>
+                    <TextBlock Text="Панель инструментов" VerticalAlignment="Center"/>
+                </DockPanel>
+            </TabItem.Header>
+            <ScrollViewer>
+                <Grid HorizontalAlignment="Left" ext:GridExt.Columns="a,*" ext:GridExt.Rows="a#26" Margin="2">
+                    <Grid.Resources>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap"/>
+                            <Setter Property="Margin" Value="2"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Background" Value="#eee"/>
+                            <Setter Property="Margin" Value="0,2"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Style.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="5"/>
+                                    <Setter Property="Padding" Value="2"/>
+                                    <Setter Property="Margin" Value="2,4"/>
+                                </Style>
+                            </Style.Resources>
+                        </Style>
+                        <Style TargetType="ToggleButton">
+                            <Setter Property="Background" Value="#eee"/>
+                            <Setter Property="Margin" Value="0,2"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Style.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="5"/>
+                                    <Setter Property="Padding" Value="2"/>
+                                    <Setter Property="Margin" Value="2,4"/>
+                                </Style>
+                            </Style.Resources>
+                        </Style>
+                    </Grid.Resources>
+                    <Image Grid.ColumnSpan="2" Margin="4,10,4,4" Source="/Resources/Help/Tools.png" Stretch="None" HorizontalAlignment="Left"/>
+
+                    <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Margin="4,20,4,4" Text="1. Кнопки действий с файлами/документами" FontWeight="Bold" FontSize="15"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="Отобразить окно выбора одного или нескольких файлов с компьютера или из сетевых расположений. Выбранные файлы будут проверены и добавлены в очередь загрузки"/>
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="Отобразить окно выбора папки с компьютера или из сетевых расположений. Файлы, содержащиеся в этих папках, будут проверены и добавлены в очередь загрузки"/>
+                    <TextBlock Grid.Row="4" Grid.Column="1" Text="Объединить листы выбранных файлов в интерфейсе программы. Исходные файлы не будут затронуты"/>
+                    <TextBlock Grid.Row="5" Grid.Column="1" Text="Удалить выбранные файлы  из списка. Исходные файлы не будут затронуты"/>
+
+                    <TextBlock Grid.Row="6" Grid.ColumnSpan="2" Margin="4,20,4,4" Text="2. Переключатели параметров сканирования" FontWeight="Bold" FontSize="15"/>
+                    <TextBlock Grid.Row="7" Grid.ColumnSpan="2" Text="Эти параметры влияют на скорость сканирования файлов. Если нет необходимости в расширенном поиске, оставьте эти функции выключенными для более быстрого сканирования. Не имеют эффекта на уже добавленные в список файлы" FontStyle="Italic"/>
+                    <TextBlock Grid.Row="8" Grid.Column="1" Text="При включении позволяет программе проверять файлы архивов на наличие поддерживаемых файлов внутри"/>
+                    <TextBlock Grid.Row="9" Grid.Column="1" Text="При включении позволяет программе проверять файлы сохранённых электронных писем на наличие поддерживаемых файлов внутри"/>
+
+                    <TextBlock Grid.Row="10" Grid.ColumnSpan="2" Margin="4,20,4,4" Text="3. Переключатели параметров подсчёта" FontWeight="Bold" FontSize="15"/>
+                    <TextBlock Grid.Row="11" Grid.ColumnSpan="2" Text="Эти параметры определяют особенности подсчета листов. Применяются в реальном времени, влияют на ранее добавленные файлы и на добавляемые вновь" FontStyle="Italic"/>
+                    <TextBlock Grid.Row="12" Grid.Column="1" Text="Учитывать раздельно листы различной ориентации (вертикальные, горизонтальные, квадратные)"/>
+                    <TextBlock Grid.Row="13" Grid.Column="1" Text="Отображать в статистике неформатные листы (не являющиеся основными или дополнительными форматами по ГОСТ 2.301-68 «ЕСКД. Форматы»)"/>
+                    <TextBlock Grid.Row="14" Grid.Column="1" Text="Выполнять преобразование неформатных листов в эквивалент А4 по соотношению их площади"/>
+                    <TextBlock Grid.Row="15" Grid.Column="1" Text="Отображать в статистике точные размеры неформатных листов вместо объединения в общую группу"/>
+
+                    <TextBlock Grid.Row="16" Grid.ColumnSpan="2" Margin="4,20,4,4" Text="4. Переключатели системных параметров" FontWeight="Bold" FontSize="15"/>
+                    <TextBlock Grid.Row="17" Grid.ColumnSpan="2" Text="Дополнительные опции для удобства взаимодействия с программой" FontStyle="Italic"/>
+                    <TextBlock Grid.Row="18" Grid.Column="1" Text="Добавить возможность быстрого вызова программы из контекстного меню Проводника для файлов .pdf"/>
+                    <TextBlock Grid.Row="19" Grid.Column="1" Text="Добавить возможность быстрого вызова программы из контекстного меню Проводника для папок"/>
+                    <TextBlock Grid.Row="20" Grid.Column="1" Text="Добавить возможность быстрого вызова программы из контекстного меню Проводника для архивов"/>
+                    <TextBlock Grid.Row="21" Grid.Column="1" Text="Добавить возможность быстрого вызова программы из контекстного меню Проводника для e-mail"/>
+                    <TextBlock Grid.Row="22" Grid.Column="1" Text="Закрепить окно программы поверх остальных окон"/>
+
+                    <TextBlock Grid.Row="23" Grid.ColumnSpan="2" Margin="4,20,4,4" Text="5. Кнопки информации" FontWeight="Bold" FontSize="15"/>
+                    <TextBlock Grid.Row="24" Grid.Column="1" Text="Окно справки по использовванию программы"/>
+                    <TextBlock Grid.Row="25" Grid.Column="1" Text="Окно с основной информацией о программе"/>
+                    
+                    <Button Grid.Row="2" ToolTip="Добавить файлы...">
+                        <Image Source="{ext:Icon /PaperCounter;component/Resources/Icons/ListAddFile.ico, 16}" />
+                    </Button>
+                    <Button Grid.Row="3" ToolTip="Добавить папки...">
+                        <Image Source="{ext:Icon /PaperCounter;component/Resources/Icons/ListAddFolder.ico, 16}" />
+                    </Button>
+                    <Button Grid.Row="4"  ToolTip="Объединить документы">
+                        <Image Source="{ext:Icon /PaperCounter;component/Resources/Icons/ListCombine.ico, 16}" />
+                    </Button>
+                    <Button Grid.Row="5" ToolTip="Удалить из списка">
+                        <Image Source="{ext:Icon /PaperCounter;component/Resources/Icons/ListDelete.ico, 16}" />
+                    </Button>
+
+                    <ToggleButton Grid.Row="8" ToolTip="Искать документы в архивах">
+                        <Image Source="{ext:Icon /PaperCounter;component/Resources/Icons/LoadArchive.ico, 16}" />
+                    </ToggleButton>
+                    <ToggleButton Grid.Row="9" ToolTip="Искать документы в сохраненных e-mail">
+                        <Image Source="{ext:Icon /PaperCounter;component/Resources/Icons/LoadMail.ico, 16}" />
+                    </ToggleButton>
+
+                    <ToggleButton Grid.Row="12" ToolTip="Учитывать ориентацию">
+                        <Image Source="{ext:Icon /PaperCounter;component/Resources/Icons/CountOrientation.ico, 16}" />
+                    </ToggleButton>
+                    <ToggleButton Grid.Row="13" ToolTip="Учитывать неформатные листы">
+                        <Image Source="{ext:Icon /PaperCounter;component/Resources/Icons/CountUnknown.ico, 16}" />
+                    </ToggleButton>
+                    <ToggleButton Grid.Row="14" ToolTip="Экв.А4 для неформатных листов">
+                        <Image Source="{ext:Icon /PaperCounter;component/Resources/Icons/CountUnknownToA4.ico, 16}" />
+                    </ToggleButton>
+                    <ToggleButton Grid.Row="15" ToolTip="Точные размеры неформатных листов">
+                        <Image Source="{ext:Icon /PaperCounter;component/Resources/Icons/CountUnknownSize.ico, 16}" />
+                    </ToggleButton>
+
+                    <ToggleButton Grid.Row="18" ToolTip="Добавить в контекстное меню для файлов PDF">
+                        <Image Source="{ext:Icon /PaperCounter;component/Resources/Icons/ConfigMenuFile.ico, 16}" />
+                    </ToggleButton>
+                    <ToggleButton Grid.Row="19" ToolTip="Добавить в контекстное меню для папок">
+                        <Image Source="{ext:Icon /PaperCounter;component/Resources/Icons/ConfigMenuFolder.ico, 16}" />
+                    </ToggleButton>
+                    <ToggleButton Grid.Row="20" ToolTip="Добавить в контекстное меню для архивов" >
+                        <Image Source="{ext:Icon /PaperCounter;component/Resources/Icons/ConfigMenuArchive.ico, 16}" />
+                    </ToggleButton>
+                    <ToggleButton Grid.Row="21" ToolTip="Добавить в контекстное меню для e-mail">
+                        <Image Source="{ext:Icon /PaperCounter;component/Resources/Icons/ConfigMenuMail.ico, 16}" />
+                    </ToggleButton>
+                    <ToggleButton Grid.Row="22" ToolTip="Всегда поверх других окон">
+                        <Image Source="{ext:Icon /PaperCounter;component/Resources/Icons/ConfigTopmost.ico, 16}" />
+                    </ToggleButton>
+
+                    <Button  Grid.Row="24" ToolTip="Помощь...">
+                        <Image Source="{ext:Icon /PaperCounter;component/Resources/Icons/InfoHelp.ico, 16}" />
+                    </Button>
+                    <Button Grid.Row="25" ToolTip="О программе...">
+                        <Image Source="{ext:Icon /PaperCounter;component/Resources/Icons/InfoAbout.ico, 16}" />
+                    </Button>
+                </Grid>
+            </ScrollViewer>
+        </TabItem>
+        <TabItem>
+            <TabItem.Header>
+                <DockPanel>
+                    <Image Width="24" Margin="4" Source="{ext:Icon /PaperCounter;component/Resources/Help/IconInteraction.ico, 24}"/>
+                    <TextBlock Text="Взаимодействие" VerticalAlignment="Center"/>
+                </DockPanel>
+            </TabItem.Header>
+            <ScrollViewer>
+                <StackPanel>
+                    <StackPanel.Resources>
+                        <Style TargetType="Image">
+                            <Setter Property="HorizontalAlignment" Value="Left"/>
+                            <Setter Property="Stretch" Value="None"/>
+                            <Setter Property="Margin" Value="4"/>
+                        </Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap"/>
+                            <Setter Property="Margin" Value="4,10,4,4"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                        </Style>
+                    </StackPanel.Resources>
+                    <TextBlock Text="1. Перетаскивание файлов и папок из Проводника. Неподдерживаемые файлы будут пропущены"/>
+                    <Image Source="/Resources/Help/Interaction1_Drop.png"/>
+                    <TextBlock Text="2. Вывод полного пути к файлу при наведении на него"/>
+                    <Image Source="/Resources/Help/Interaction2_Path.png"/>
+                    <TextBlock Text="3. Просмотр информации по одному файлу, всем файлам, либо по группе файлов, выделенных с помощью Shift+Клик или Ctrl+Клик"/>
+                    <Image Source="/Resources/Help/Interaction3_Select.png"/>
+                    <TextBlock Text="4. Копирование выбранных строк для вставки в письмо, документ Word, Excel и т.д."/>
+                    <Image Source="/Resources/Help/Interaction4_Copy.png"/>
+                    <TextBlock Text="5. Переупорядочивание файлов перетаскиванием. Можно перетаскивать сразу группы файлов"/>
+                    <Image Source="/Resources/Help/Interaction5_Arrange.png"/>
+                    <TextBlock Text="6. Объединение файлов перетаскиванием. В процессе перетаскивания зажмите Shift, визуальная подсказка изменит свой вид"/>
+                    <Image Source="/Resources/Help/Interaction6_Combine.png"/>
+                    <TextBlock Text="7. Файлы из списка можно удалять не только кнопкой на панели инструментов, но и кнопкой Del/Delete"/>
+                    <Image Source="/Resources/Help/Interaction7_Delete.png"/>
+                    <TextBlock Text="8. Файлы в списке можно переименовывать, не затрагивая исходный файл. Дойной клик для начала переименования, Enter или клик вне текстового поля для подтверждения, Esc для отмены"/>
+                    <Image Source="/Resources/Help/Interaction8_Rename.png"/>
+                    <TextBlock Text="9. Быстрый вызов из контекстного меню Проводника, если соответствующая опция включена"/>
+                    <Image Source="/Resources/Help/Interaction9_ContextMenu.png"/>
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
+    </TabControl>
+</Window>
