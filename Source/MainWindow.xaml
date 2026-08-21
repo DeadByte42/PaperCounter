@@ -203,7 +203,7 @@
                     </GridSplitter>
 
                     <DataGrid Grid.Column="2"
-                              BorderThickness="0"  Background="White" AlternatingRowBackground="#ebebf0" HeadersVisibility="Column" GridLinesVisibility="Vertical" VerticalGridLinesBrush="#bbb"
+                              BorderThickness="0"  Background="White" AlternationCount="2" HeadersVisibility="Column" GridLinesVisibility="Vertical" VerticalGridLinesBrush="#bbb"
                               ItemsSource="{Binding SelectedDoc.Pages}" AutoGenerateColumns="False"  ClipboardCopyMode="IncludeHeader"
                               CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False"  CanUserReorderColumns="False" CanUserSortColumns="False">
 
@@ -218,6 +218,18 @@
                             <DataGridTextColumn Header="Листов" IsReadOnly="True" Binding="{Binding Count}"/>
                             <DataGridTextColumn Header="Экв. А4" IsReadOnly="True" Binding="{Binding CountA4, StringFormat=0.##}"/>
                         </DataGrid.Columns>
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Style.Triggers>
+                                    <Trigger Property="AlternationIndex" Value="1">
+                                        <Setter Property="Background" Value="#ebebf0"/>
+                                    </Trigger>
+                                    <DataTrigger Binding="{Binding Info.FormatType}" Value="Total">
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
                     </DataGrid>
                 </Grid>
             </TabItem>
@@ -397,7 +409,7 @@
                                     <Setter Property="Margin" Value="2"/>
                                 </Style>
                             </StackPanel.Resources>
-                            <TextBlock Text="Версия: 1.5.3"/>
+                            <TextBlock Text="Версия: 1.5.4"/>
                             <TextBlock Text="Разработчик: DeadByte42 (Кокорин Андрей)"/>
                             <TextBlock>Исходный код:
                             <Hyperlink NavigateUri="https://github.com/DeadByte42/PaperCounter" RequestNavigate="HyperlinkNavigate">Github</Hyperlink>

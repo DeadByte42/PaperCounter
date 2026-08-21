@@ -116,8 +116,7 @@ namespace PaperCounter.Utility
                         {
                             es.CopyTo(ms);
                             ms.Position = 0;
-                            path.Add(entry.Key);
-                            LoadFromStream(ms, path);
+                            LoadFromStream(ms, new List<string> (path){ entry.Key });
                         }
         }
 
@@ -127,8 +126,7 @@ namespace PaperCounter.Utility
                 foreach (var att in message.Attachments)
                     if (CanLoad(att.Filename))
                     {
-                        path.Add(att.Filename);
-                        LoadFromStream(att.OpenRead(), path);
+                        LoadFromStream(att.OpenRead(), new List<string>(path){ att.Filename});
                     }
         }
 
@@ -138,8 +136,7 @@ namespace PaperCounter.Utility
                 foreach (var att in message.Attachments)
                     if (CanLoad(att.Filename))
                     {
-                        path.Add(att.Filename);
-                        LoadFromStream(att.OpenRead(), path);
+                        LoadFromStream(att.OpenRead(), new List<string>(path) { att.Filename });
                     }
         }
     }

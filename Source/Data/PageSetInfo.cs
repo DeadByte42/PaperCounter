@@ -33,6 +33,11 @@ namespace PaperCounter
             if (FormatType != FormatType.Custom || IsCountMiscExact)
                 Description += $", площадь эквивалентна {format.SizeMult:0.##} л.А4";
         }
+        public PageSetInfo()
+        {
+            FormatType = FormatType.Total;
+            Name = "Итого";
+        }
 
         public bool IsMatch(PageFormatInfo format)
         {

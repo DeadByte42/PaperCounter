@@ -260,7 +260,7 @@
                     <Image Source="/Resources/Help/Interaction4_Copy.png"/>
                     <TextBlock Text="5. Переупорядочивание файлов перетаскиванием. Можно перетаскивать сразу группы файлов"/>
                     <Image Source="/Resources/Help/Interaction5_Arrange.png"/>
-                    <TextBlock Text="6. Объединение файлов перетаскиванием. В процессе перетаскивания зажмите Shift, визуальная подсказка изменит свой вид"/>
+                    <TextBlock Text="6. Объединение файлов перетаскиванием. В процессе перетаскивания зажмите Alt, визуальная подсказка изменит свой вид"/>
                     <Image Source="/Resources/Help/Interaction6_Combine.png"/>
                     <TextBlock Text="7. Файлы из списка можно удалять не только кнопкой на панели инструментов, но и кнопкой Del/Delete"/>
                     <Image Source="/Resources/Help/Interaction7_Delete.png"/>

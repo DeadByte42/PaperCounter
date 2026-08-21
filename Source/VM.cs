@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace PaperCounter
@@ -317,7 +318,14 @@ namespace PaperCounter
         private readonly Dictionary<PageFormatInfo, List<Document>> DBFormats=new();
         private readonly Dictionary<PageSetInfo,List<PageFormatInfo> > DBSets=new();
         public ObservableCollection<Document> Documents { get; private set; }
-        public ICollectionView DisplayCollection { get; private set; }
+        private Comparison<PageSet> _pageSort = (a, b) =>
+        {
+            if (a.Info.FormatType <= FormatType.Secondary && b.Info.FormatType <= FormatType.Secondary)
+                return new NaturalStringComparer().Compare(a.Info.Name, b.Info.Name);
+            if (a.Info.FormatType < b.Info.FormatType) return -1;
+            if (a.Info.FormatType > b.Info.FormatType) return 1;
+            return new NaturalStringComparer().Compare(b.Info.Name, a.Info.Name);
+        };
 
         private Document selectedDoc;
         public Document SelectedDoc
@@ -390,7 +398,7 @@ namespace PaperCounter
                 Documents.Add(doc);
                 ResetDocument(doc);
                 ResetDocument(TotalDoc);
-                TotalDoc.Pages.Sort((a, b) => a.Info.FormatType < b.Info.FormatType ? -1 : a.Info.FormatType > b.Info.FormatType ? 1 : new NaturalStringComparer().Compare(a.Info.Name, b.Info.Name));
+                TotalDoc.Pages.Sort(_pageSort);
 
             }
             if (Documents.Count == 0)
@@ -413,20 +421,23 @@ namespace PaperCounter
 
 
             if (SelectedDoc != null)
-            {
-                var sel = SelectedDoc;
-                SelectedDoc = null;
-                ResetDocument(sel);
-                sel.Pages.Sort((a, b) => a.Info.FormatType < b.Info.FormatType ? -1 : a.Info.FormatType > b.Info.FormatType ? 1 : new NaturalStringComparer().Compare(a.Info.Name, b.Info.Name));
-                SelectedDoc = sel;
-            }
+            ResetDocument(SelectedDoc);
+            //if (SelectedDoc != null)
+            //{
+            //    var sel = SelectedDoc;
+            //    SelectedDoc = null;
+            //    ResetDocument(sel);
+            //    sel.Pages.Sort(_pageSort);
+            //    SelectedDoc = sel;
+            //}
             FormatsChanged?.Invoke(DBSets.Keys.OrderBy(p => p.FormatType)    .ThenBy(p => p.Name, new NaturalStringComparer())    .ToList());
-            TotalDoc.Pages.Sort((a, b) => a.Info.FormatType < b.Info.FormatType ? -1 : a.Info.FormatType > b.Info.FormatType ? 1 : new NaturalStringComparer().Compare(a.Info.Name, b.Info.Name));
+            TotalDoc.Pages.Sort(_pageSort);
         }
         private void ResetDocument(Document doc)
         {
             doc.Pages.Clear();
 
+            var totalSet = new PageSet(new());
             foreach (var fm in doc.RawPages)
             {
                 if (!IsCountMisc && fm.Info.FormatType == FormatType.Custom)
@@ -447,37 +458,51 @@ namespace PaperCounter
                 }
 
                 pset.AddFormat(fm);
-
-                foreach (var ps in doc.Pages)
-                    pset.Update();
+                totalSet.AddFormat(fm);
             }
+            if (doc == SelectedDoc)
+            {
+                doc.Pages.Add(totalSet);
+                doc.Pages.Sort(_pageSort);
+            }
+
+            foreach (var ps in doc.Pages)
+                ps.Update();
 
             doc.Update();
         }
 
         public void SelectDocuments(List<Document> docs)
         {
-            if (docs.Contains(TotalDoc))
-                SelectedDoc = TotalDoc;
+            if (docs.Count == 0)
+                SelectedDoc = null;
             else
             {
                 var selectedDoc = new Document(0);
-                foreach (var doc in docs)
-                    foreach (var f in doc.RawPages)
-                    {
-                        var fmt = selectedDoc.RawPages.FirstOrDefault(a => a.Info == f.Info);
-                        if (fmt != null)
-                            fmt.Count += f.Count;
-                        else
+
+                if (docs.Contains(TotalDoc))
+                    foreach (var f in TotalDoc.RawPages)
+                        selectedDoc.RawPages.Add(f);
+                else
+                {
+                    foreach (var doc in docs)
+                        foreach (var f in doc.RawPages)
                         {
-                            fmt = new PageFormat(f.Info, f.Count);
-                            selectedDoc.RawPages.Add(fmt);
+                            var fmt = selectedDoc.RawPages.FirstOrDefault(a => a.Info == f.Info);
+                            if (fmt != null)
+                                fmt.Count += f.Count;
+                            else
+                            {
+                                fmt = new PageFormat(f.Info, f.Count);
+                                selectedDoc.RawPages.Add(fmt);
+                            }
                         }
-                    }
-                ResetDocument(selectedDoc);
-                selectedDoc.Pages.Sort((a,b)=>a.Info.FormatType<b.Info.FormatType?-1: a.Info.FormatType > b.Info.FormatType?1: new NaturalStringComparer().Compare(a.Info.Name, b.Info.Name));
+                }
+
                 SelectedDoc = selectedDoc;
+                ResetDocument(selectedDoc);
             }
+            //selectedDoc.Pages.Sort(_pageSort);
         }
 
 
@@ -503,7 +528,7 @@ namespace PaperCounter
 
 
         //============
-        //  Info
+        //  Saving
         //============
         #region Saving
 

@@ -4,6 +4,7 @@
     {
         Primary,
         Secondary,
-        Custom
+        Custom,
+        Total
     }
 }

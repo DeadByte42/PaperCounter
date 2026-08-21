@@ -57,7 +57,6 @@ namespace PaperCounter.Utility
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
 
-            Debug.WriteLine("add");
             lock (_lockObj)
             {
                 int added = 0;

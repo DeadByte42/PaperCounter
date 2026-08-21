@@ -16,7 +16,7 @@ namespace PaperCounter
             Width = vertical ? definition.ShortSide : definition.LongSide;
             Height = vertical ? definition.LongSide : definition.ShortSide;
             Name = definition.Name;
-            Size = (int)Math.Max(Width, Height) + "x" + (int)Math.Min(Width, Height);
+            Size = (int)Math.Max(Width, Height) + "*" + (int)Math.Min(Width, Height);
             SizeMult = definition.SizeMult;
             FormatType = definition.FormatType;
         }
@@ -25,7 +25,7 @@ namespace PaperCounter
         {
             Width = width;
             Height = height;
-            Name = (int)Math.Max(Width, Height) + "x" + (int)Math.Min(Width, Height);
+            Name = (int)Math.Max(Width, Height) + "*" + (int)Math.Min(Width, Height);
             Size = Name;
             SizeMult = width * height / 297 / 210;
             FormatType = FormatType.Custom;

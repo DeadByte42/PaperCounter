@@ -120,7 +120,7 @@ namespace PaperCounter
             var dataObject = dropInfo.Data as IDataObject;
             if (dataObject != null && dataObject.GetDataPresent(DataFormats.FileDrop))
                 dropInfo.Effects = DragDropEffects.Copy;
-            else if (dropInfo.KeyStates.HasFlag(DragDropKeyStates.ShiftKey))  
+            else if (dropInfo.KeyStates.HasFlag(DragDropKeyStates.AltKey))  
             {
                 if ((dropInfo.Data is Document doc && doc != dropInfo.TargetItem || dropInfo.Data is IList docs && !docs.Contains(dropInfo.TargetItem)))
                 {
@@ -137,7 +137,7 @@ namespace PaperCounter
             var dataObject = dropInfo.Data as DataObject;
             if (dataObject != null && dataObject.GetDataPresent(DataFormats.FileDrop))
                 vm.EnqueueDocuments((string[])dataObject.GetData(DataFormats.FileDrop));
-            else if (dropInfo.KeyStates.HasFlag(DragDropKeyStates.ShiftKey))
+            else if (dropInfo.KeyStates.HasFlag(DragDropKeyStates.AltKey))
             {
                 List<Document> sources = new List<Document>();
                 if (dropInfo.TargetItem is Document doc1 && dropInfo.Data is Document doc2 && doc1 != doc2)
