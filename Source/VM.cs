@@ -154,6 +154,7 @@ namespace PaperCounter
             if (documents.Contains(TotalDoc)||documents.Count==Documents.Count-1)
             {
                 Documents.Clear();
+                DBFormats.Clear();
                 TotalDoc.RawPages.Clear();
                 TotalDoc.Pages.Clear();
             }

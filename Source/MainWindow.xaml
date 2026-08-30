@@ -409,7 +409,7 @@
                                     <Setter Property="Margin" Value="2"/>
                                 </Style>
                             </StackPanel.Resources>
-                            <TextBlock Text="Версия: 1.5.4"/>
+                            <TextBlock Text="Версия: 1.5.5"/>
                             <TextBlock Text="Разработчик: DeadByte42 (Кокорин Андрей)"/>
                             <TextBlock>Исходный код:
                             <Hyperlink NavigateUri="https://github.com/DeadByte42/PaperCounter" RequestNavigate="HyperlinkNavigate">Github</Hyperlink>
